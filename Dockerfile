@@ -1,4 +1,4 @@
-FROM nvidia/cuda:12.8.1-runtime-ubuntu24.04
+FROM nvidia/cuda:12.4.1-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
@@ -32,9 +32,9 @@ RUN curl -fsSL https://raw.githubusercontent.com/filebrowser/get/master/get.sh |
 # --- Jupyter ---
 RUN pip install jupyterlab
 
-# --- PyTorch nightly cu128 (Blackwell sm_120 support) ---
-RUN pip install --pre torch torchvision torchaudio \
-    --index-url https://download.pytorch.org/whl/nightly/cu128
+# --- PyTorch stable cu124 (RTX 20xx/30xx/40xx support) ---
+RUN pip install torch torchvision torchaudio \
+    --index-url https://download.pytorch.org/whl/cu124
 
 # --- ComfyUI ---
 ARG CACHE_DATE
