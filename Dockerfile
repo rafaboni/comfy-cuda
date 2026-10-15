@@ -1,4 +1,4 @@
-FROM nvidia/cuda:12.8.1-runtime-ubuntu22.04
+FROM nvidia/cuda:13.0.2-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
@@ -34,10 +34,11 @@ RUN curl -fsSL https://raw.githubusercontent.com/filebrowser/get/master/get.sh |
 # --- Jupyter ---
 RUN pip install jupyterlab
 
-# --- PyTorch 2.11.0 cu128 (Turing a Blackwell: RTX 20xx/30xx/40xx/50xx, A/L-series) ---
+# --- PyTorch 2.14.1 estable cu130 (Turing a Blackwell; driver >= 580: crear pods con --min-cuda-version 13.0) ---
+# cu130 porque con cu128 ComfyUI 0.40 desactiva comfy-kitchen (kernels int8/nvfp4 que usa MiniMax H3).
 # Se congela torch en /tmp/constraints.txt para que ningun requirements.txt lo cambie.
-RUN pip install torch==2.11.0 torchvision torchaudio \
-    --index-url https://download.pytorch.org/whl/cu128 && \
+RUN pip install torch==2.14.1 torchvision torchaudio \
+    --index-url https://download.pytorch.org/whl/cu130 && \
     pip freeze | grep -E '^(torch|torchvision|torchaudio)==' > /tmp/constraints.txt && \
     cat /tmp/constraints.txt
 ENV PIP_CONSTRAINT=/tmp/constraints.txt
@@ -90,6 +91,9 @@ RUN for dir in /comfyuiworkspace/ComfyUI/custom_nodes/*/; do \
     pip install onnxruntime-gpu || echo "onnxruntime-gpu" >> /comfyuiworkspace/node_deps_failed.txt; \
     python -c "import torch; print('torch', torch.__version__, 'cuda', torch.version.cuda)"; \
     cat /comfyuiworkspace/node_deps_failed.txt 2>/dev/null || echo "deps de nodes: sin fallos"
+
+# --- rgthree: su parche de ejecucion recursiva rompe con ComfyUI 0.40 (execution.recursive_output_delete_if_changed ya no existe) ---
+RUN printf '{\n  "patch_recursive_execution": false\n}\n' > /comfyuiworkspace/ComfyUI/custom_nodes/rgthree-comfy/rgthree_config.json
 
 # --- MCP comfy-pod (:8190, lo arranca start.sh si hay MCP_TOKEN) ---
 COPY comfy-pod-mcp/ /opt/comfy-pod-mcp/
