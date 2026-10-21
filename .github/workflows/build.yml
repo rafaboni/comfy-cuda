@@ -3,6 +3,9 @@ name: Build and Push to Docker Hub
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - 'wangp/**'
+      - '.github/workflows/build-wangp.yml'
   workflow_dispatch:
 
 jobs:
