@@ -35,12 +35,14 @@ echo "SSH running: $(ss -tlnp | grep :22 || echo 'check manually')"
 
 # ── Jupyter Lab (:8888, raiz /) ──────────────────────────────────────────────
 echo "[1/2] Jupyter Lab..."
-(cd / && jupyter lab --allow-root --no-browser --port=8888 --ip=0.0.0.0 \
-  --ServerApp.token='' \
-  --ServerApp.password='' \
+# Jupyter Server lee JUPYTER_TOKEN (--ServerApp.token esta deprecado)
+JUPYTER_TOKEN_VALUE="${WANGP_AUTH_PASSWORD:-$(python3 -c 'import secrets; print(secrets.token_hex(24))')}"
+if [[ -z "${WANGP_AUTH_PASSWORD:-}" ]]; then
+  echo "⚠️  WANGP_AUTH_PASSWORD no definida — Jupyter queda con token aleatorio"
+fi
+(cd / && JUPYTER_TOKEN="$JUPYTER_TOKEN_VALUE" jupyter lab --allow-root --no-browser --port=8888 --ip=0.0.0.0 \
   --ServerApp.allow_origin='*' \
   --ServerApp.allow_remote_access=True \
-  --ServerApp.disable_check_xsrf=True \
   > /var/log/jupyter.log 2>&1) &
 
 # ── WanGP (:7860) ────────────────────────────────────────────────────────────

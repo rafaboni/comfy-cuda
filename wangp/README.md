@@ -4,7 +4,7 @@ Imagen `rafaboni/wangp`: [WanGP](https://github.com/deepbeepmeep/WanGP) (deepbee
 
 ## Puertos
 - 7860: WanGP (Gradio)
-- 8888: Jupyter Lab (raíz `/`, sin token)
+- 8888: Jupyter Lab (raíz `/`, con token: `WANGP_AUTH_PASSWORD` o token aleatorio)
 - 22: SSH (solo claves)
 
 ## Variables

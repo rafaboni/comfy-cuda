@@ -36,7 +36,7 @@ RUN curl -fsSL https://raw.githubusercontent.com/filebrowser/get/master/get.sh |
 RUN pip install jupyterlab
 
 # --- PyTorch 2.14.1 estable cu130 (Turing a Blackwell; driver >= 580: crear pods con --min-cuda-version 13.0) ---
-# cu130 porque con cu128 ComfyUI 0.40 desactiva comfy-kitchen (kernels int8/nvfp4 que usa MiniMax H3).
+# cu130 porque con cu128 ComfyUI (>=0.40) desactiva comfy-kitchen (kernels int8/nvfp4 que usa MiniMax H3).
 # Se congela torch en /tmp/constraints.txt para que ningun requirements.txt lo cambie.
 RUN pip install torch==2.14.1 torchvision torchaudio \
     --index-url https://download.pytorch.org/whl/cu130 && \
@@ -46,7 +46,7 @@ ENV PIP_CONSTRAINT=/tmp/constraints.txt
 
 # --- ComfyUI (version fijada: H3 pide >=0.30, los workflows 10sorlabs usan nodos core de 0.35) ---
 ARG CACHE_DATE
-ARG COMFYUI_REF=v0.40.0
+ARG COMFYUI_REF=v0.43.0
 WORKDIR /comfyuiworkspace
 RUN git clone --depth 1 --branch ${COMFYUI_REF} https://github.com/Comfy-Org/ComfyUI.git && \
     test -f ComfyUI/main.py || (echo "FATAL: ComfyUI/main.py not found!" && exit 1)
